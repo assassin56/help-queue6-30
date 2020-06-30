@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import NewTicketForm from './NewTicketForm';
 import TicketList from './TicketList';
 import Check1 from './Check';
@@ -9,16 +9,17 @@ class TicketControl extends React.Component {
     super(props);
     this.state = {
       checkQuestion: 0,
-      formVisibleOnPage: false
-
+      formVisibleOnPage: false,
+      tickets: false
     };
+    let [checkQuestion, setCheck] = useState(0)
 
   }
   handleClick = ()=>{
     if (!this.state.formVisibleOnPage) {
       switch (this.state.checkQuestion) {
         case (0):
-          this.setState({  checkQuestion:1 })
+          this.setState({  checkQuestion:1, tickets:false })
           break;
         case (1):
           this.setState({  checkQuestion:2 })
@@ -26,25 +27,26 @@ class TicketControl extends React.Component {
         case (2):
           this.setState({  checkQuestion:3 , formVisibleOnPage: true})
           break;
-        case (3):
-            this.setState({  checkQuestion:3 , formVisibleOnPage: true})
-        break;
         default:
-          this.setState({  checkQuestion:4 })
+          this.setState({  checkQuestion:0 })
           break;
       }
     }
-   // this.setState({ checkQuestion });
   }
-
-  render() {
+   
+  goBack=()=>{
+    this.setState({tickets:true, formVisibleOnPage: false, checkQuestion:0})
+  }
+ 
+    render() {
     let currentlyVisibleState = null;
     let buttonText = null;
-    let questionText = ["Have you read through LHTP?", "have you asked another pair?", "have you prayed?", ""]
+    let questionText = ["have you read through LHTP and still need help?", "have you asked another pair?", "have you prayed?", ""]
     if (this.state.formVisibleOnPage) {
       currentlyVisibleState = <NewTicketForm />;
       questionText = questionText[this.state.checkQuestion]
-        console.log(questionText)
+    
+  
       buttonText = "Return to Ticket List";
     } else {
       if (this.state.checkQuestion === 0) {
@@ -58,21 +60,13 @@ class TicketControl extends React.Component {
         currentlyVisibleState = <Check1 />;
         questionText = questionText[this.state.checkQuestion]
         buttonText = "Yes";
-      } else if (this.state.checkQuestion === 3) {
-        currentlyVisibleState = <Check1 />
-        questionText = questionText[this.state.checkQuestion]
-        console.log(questionText)
-        buttonText = "Yes";
-      }else {
-      currentlyVisibleState = <TicketList/>
-      }
+      } 
     }
     return (
       <React.Fragment>
-        {currentlyVisibleState}
+        {this.state.tickets? <TicketList/>: currentlyVisibleState}
         {typeof questionText !== "string" ? questionText[0]: questionText}
-        <button onClick={this.handleClick}>{buttonText}</button> 
-        
+        {this.state.formVisibleOnPage? <button onClick={this.goBack}>go back</button>:  <button onClick={this.handleClick}>{buttonText}</button> }
       </React.Fragment>
     );
   }
